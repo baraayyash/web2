@@ -139,6 +139,11 @@ const server = http.createServer((request, response) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Products API server running at http://localhost:${PORT}/`);
-    console.log('Endpoints: GET/POST /api/products, GET/PUT/DELETE /api/products/:id');
+    console.log("");
+    console.log(chalk.green.bold("🚀 Server started successfully!"));
+    console.log("");
+    console.log(chalk.blue("🌐 Local:   ") + chalk.white(`http://localhost:${PORT}`));
+    console.log(chalk.magenta("📦 API:     ") + chalk.white(`http://localhost:${PORT}/api/products`));
+    console.log(chalk.yellow("📄 Frontend:") + chalk.white(`http://localhost:${PORT}/products.html`));
+    console.log("");
 });
