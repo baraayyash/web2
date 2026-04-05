@@ -1,12 +1,11 @@
 const express = require('express');
 const { pool, sequelize } = require('./db');
-const Customer = require('./models/Customers');
-const Order = require('./models/Orders');
+const Customer = require('./models/Customer');
+const Order = require('./models/Order');
 const app = express();
 const port = 3000;
 
 app.use(express.json());
-
 
 
 app.get('/api/products', async (req, res) => {
@@ -103,7 +102,7 @@ app.get('/api/customers', async (req, res) => {
 
 app.get('/api/customers/:id', async (req, res) => {
     try {
-        const customer = await Customer.findByPk(req.params.id);
+        const customer = await Customer.findByPk(req.params.id, {include : Order});
         if (!customer) {
             return res.status(404).json({ message: 'Customer not found' });
         }
@@ -158,6 +157,9 @@ app.delete('/api/customers/:id', async (req, res) => {
 
 ///// CRUD Orders /////
 
+
+
+
 app.get('/api/orders', async (req, res) => {
     try {
         const orders = await Order.findAll();
@@ -171,8 +173,13 @@ app.get('/api/orders', async (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
     try {
+        const customer = await Customer.findByPk(req.body.customerId);
+        if (!customer) {
+            return res.status(404).json({ message: 'Customer not found' });
+        }
         const { customerId, product } = req.body;
-        const order = await Order.create({ customerId, product });
+        //const order = await Order.create({ customerId, product });
+        const order = await customer.createOrder({ product });
         res.json(order);
     } catch (error) {
         console.error(error);
@@ -180,7 +187,66 @@ app.post('/api/orders', async (req, res) => {
     }
 });
 
+app.get('/api/orders/:id', async (req, res) => {
+    try {
+        const order = await Order.findByPk(req.params.id, { include: {model: Customer, attributes: ['name', 'phone']} });
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        res.json(order);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
+app.put('/api/orders/:id', async (req, res) => {
+    try {
+        const order = await Order.findByPk(req.params.id);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        const { product } = req.body;
+        await order.update({ product });
+        await order.reload();
+        res.json(order);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.delete('/api/orders/:id', async (req, res) => {
+    try {
+        const order = await Order.findByPk(req.params.id);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        await order.destroy();
+        res.sendStatus(204);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+app.get('/api/test', async (req, res) => {
+    try {
+        // eager loading
+        //const customer = await Customer.findByPk(req.params.id, {include : Order});
+
+
+        // lazy loading
+        const customer = await Customer.findByPk(1);
+        const order = await customer.getOrders();
+        res.json(order);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 
 sequelize.authenticate().then(() => {
