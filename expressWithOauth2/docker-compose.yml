@@ -1,0 +1,16 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: expressouth2v0-mongo
+    restart: unless-stopped
+    # Use 27018 if something else (Homebrew Mongo, another container) already uses 27017
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: changeme
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
