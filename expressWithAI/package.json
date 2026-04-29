@@ -1,0 +1,20 @@
+{
+  "name": "express-with-gemini",
+  "version": "1.0.0",
+  "description": "Minimal Express demo: explain a topic via Gemini or Groq",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["express", "gemini", "ai", "education"],
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  }
+}
